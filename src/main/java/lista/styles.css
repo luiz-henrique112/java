@@ -1,0 +1,35 @@
+/* Estilo para a raiz */
+.root {
+    -fx-font-family: "Arial";
+}
+
+/* Estilo para os botões */
+.button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-padding: 10;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.button:hover {
+    -fx-background-color: #45a049;
+}
+
+/* Estilo para células da lista */
+.list-cell {
+    -fx-background-color: #f0f0f0;
+    -fx-padding: 10;
+}
+
+/* Estilo para labels */
+.label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+}
+
+/* Estilo para um componente específico */
+#submitButton {
+    -fx-background-color: #FF5733;
+    -fx-text-fill: white;
+}
