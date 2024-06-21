@@ -2,12 +2,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-
-
 public class BankSystem {
 
-   private static Map<Integer, Account> accounts = new HashMap<>();
-   private static Scanner scan = new Scanner(System.in); // Scanner movido para fora do loop
+   private static final Map<Integer, Account> accounts = new HashMap<>();
+   private static final Scanner scan = new Scanner(System.in);
 
    public static void main(String[] args) {
       int id = 0;
@@ -47,7 +45,7 @@ public class BankSystem {
             }
 
             if (accountt != null) {
-               System.out.println("\n Hi " + accountt.getUserName() + "\n Welcome back to the Nexus Bank!\n Enter\n 'pix' for you make a pix for someone\n 'withdraw' for withdraw money\n 'deposit' for deposit money in your Nexus Account\n Your balance: " + accountt.getUserBalance());
+               System.out.println(accountt.message());
                String action = scan.next();
 
                if (action.equals("pix")) {
@@ -93,7 +91,6 @@ public class BankSystem {
    }
 
    public static void pix(Account accountt, Map<Integer, Account> accounts, String name, String cpf, double value) {
-
       if (accountt.getUserBalance() >= value) {
          for (Map.Entry<Integer, Account> entry : accounts.entrySet()) {
             Account receiver = entry.getValue();
@@ -108,46 +105,63 @@ public class BankSystem {
          System.err.println("User not found");
       }
    }
-
-   
 }
-
 
 class Account {
 
-      int id;
-      double balance;
-      String name;
-      String cpf;
+   int id;
+   double balance;
+   String name;
+   String cpf;
+   String notify = null;
+   Account account_n = null;
 
-      public Account(String name, String cpf, int id) {
-         this.id = id;
-         this.balance = 50.0;
-         this.name = name;
-         this.cpf = cpf;
-      }
+   public Account(String name, String cpf, int id) {
+      this.id = id;
+      this.balance = 50.0;
+      this.name = name;
+      this.cpf = cpf;
+   }
 
-      public String getUserName() {
-         return this.name;
-      }
+   public String getUserName() {
+      return this.name;
+   }
 
-      public double getUserBalance() {
-         return this.balance;
-      }
+   public double getUserBalance() {
+      return this.balance;
+   }
 
-      public String getCpf() {
-         return this.cpf;
-      }
+   public String getCpf() {
+      return this.cpf;
+   }
 
-      public int getId() {
-         return this.id;
-      }
+   public int getId() {
+      return this.id;
+   }
 
-      public void setBalance_lose(double value) {
-         this.balance -= value;
-      }
+   public void setBalance_lose(double value) {
+      this.balance -= value;
+   }
 
-      public void receive(double value) {
-         this.balance += value;
+   public void receive(double value) {
+      this.balance += value;
+      String notification = "Received " + value + " from " + account_n.getUserName();
+
+      Map<Integer, String> notifications = new HashMap<>();
+      notifications.put(getId(), notification);
+
+      for (Map.Entry<Integer, String> entry : notifications.entrySet()) {
+         notify = "\n Notifications: " + entry.getValue();
       }
    }
+
+   public String message() {
+      String msgLogin = "\n Hi " + getUserName() + "\n Welcome back to the Nexus Bank!\n Enter\n 'pix' for you make a pix for someone\n 'withdraw' for withdraw money\n 'deposit' for deposit money in your Nexus Account  \n Your balance: " + getUserBalance();
+
+      if (notify == null) {
+         return msgLogin;
+      } else {
+         return msgLogin + notify;
+      }
+   }
+}
