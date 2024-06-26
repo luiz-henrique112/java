@@ -38,12 +38,12 @@
 
       for (String label : botoes) {
          Button button = new Button(label);
-         button.setPrefSize(50, 50); // Define o tamanho preferido do botão
-         button.setOnAction(e -> botaoClicado(label)); // Define a ação ao clicar no botão
-         raiz.add(button, col, row); // Adiciona o botão ao GridPane na posição (col, row)
+         button.setPrefSize(50, 50); 
+         button.setOnAction(e -> botaoClicado(label)); 
+         raiz.add(button, col, row); 
 
          col++;
-         if (col == 4) { // Move para a próxima linha após 4 colunas
+         if (col == 4) { 
                col = 0;
                row++;
          }
