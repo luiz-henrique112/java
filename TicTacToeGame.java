@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Random;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,14 +17,15 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class TicTacToeGame extends Application {
-      
-   public static Map<Integer, String> board = new HashMap<>(); 
+
    public static boolean isFull = false;
-   public static boolean isPlayerX = new Random().nextBoolean();
    public static boolean winner = false;
-   public static Text textt = new Text();
-   public static GridPane buttons = new GridPane();
+   public static boolean isPlayerX = new Random().nextBoolean();
    public static String winnerText = null;
+   public static Text textt = new Text();
+   public static Button resetBtn = new Button("RESTART");
+   public static GridPane buttons = new GridPane();
+   public static Map<Integer, String> board = new HashMap<>();
       
 
    @Override
@@ -33,9 +35,11 @@ public class TicTacToeGame extends Application {
       game.setPrefSize(200, 200);
       HBox text = new HBox();
       text.setPrefSize(200, 50);
-      text.getChildren().add(textt);
-
-      textt.setFont(new Font(30));
+      text.getChildren().addAll(resetBtn, textt);
+      text.setSpacing(30);
+      resetBtn.setPadding(new Insets(3));
+      resetBtn.setOnAction(event -> reset());
+      textt.setFont(new Font(15));
       
 
       VBox root = new VBox(game,text);
@@ -75,18 +79,14 @@ public class TicTacToeGame extends Application {
 
    public void btnClicked(Button btn, GridPane buttons){
       int idBtn = Integer.parseInt(btn.getId());
-      
-      
 
       if (board.get(idBtn).equals("") && isFull == false && winner == false) {
          String playerSymbol = isPlayerX ? "X" : "O";
          board.put(idBtn, playerSymbol); 
          btn.setText(playerSymbol); 
          
-         
          isPlayerX = !isPlayerX;
          
-
          String result = checkWinner();
          if (!winnerText.equals(null) && winner == true ) {
             textt.setText(result);
@@ -96,12 +96,12 @@ public class TicTacToeGame extends Application {
    }
 
    public static String checkWinner(){
-      winnerText = "Winner: none";
+      
       
 
       if (!isFull && !winner) {
          for (int i = 0; i < board.size(); i++) {
-            
+            winnerText = "Winner:";
             //horizontals
             if (!board.get(0).equals("") &&
                board.get(0).equals(board.get(1)) &&
@@ -170,11 +170,12 @@ public class TicTacToeGame extends Application {
                winner = true;
                disableButtons();
             } else {
-               
-            }
-            if (board.values().stream().noneMatch(v -> v.equals("")) && winnerText.equals("Winner: none")) {
-               disableButtons();
                winnerText = "Winner: none";
+            }
+            if (board.values().stream().noneMatch(v -> v.equals("")) && winner == false) {
+               winnerText = "Winner: none";
+               disableButtons();
+               
             }
          }
       } 
@@ -194,7 +195,24 @@ public class TicTacToeGame extends Application {
             ((Button) node).setDisable(true);
          }
       }
-  }
+   }
+
+   public void reset(){
+      winner = false;
+      isFull = false;
+      textt.setText("");
+
+      for (int i = 0; i <= 8; i++) {
+         board.put(i,"");
+      }
+
+      for (Node node : buttons.getChildren()) {
+         if (node instanceof Button) {
+            ((Button) node).setDisable(false);
+            ((Button) node).setText("");
+         }
+      }
+   }
 
 
    public static void main(String[] args) {
