@@ -58,7 +58,7 @@
          ObservableList<Task> taskList = FXCollections.observableArrayList();
          listView = new ListView<>(taskList);
 
-         // Customize the ListView to show tooltips
+         
          listView.setCellFactory(new Callback<ListView<Task>, ListCell<Task>>() {
                @Override
                public ListCell<Task> call(ListView<Task> listView) {
@@ -119,7 +119,7 @@
          dialog.getDialogPane().setContent(alignment);
          dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
 
-         descriptionField.setOnKeyPressed(e -> { // Use setOnKeyPressed instead of setOnAction
+         descriptionField.setOnKeyPressed(e -> { 
                if (e.getCode() == KeyCode.ENTER) {
                   dialog.showAndWait().ifPresent(task -> taskList.add(task));
                }
@@ -137,7 +137,7 @@
          .title("Task created with success!")
          .text("The task '" + titleField.getText() + "' have been created with success!")
          .darkStyle()
-         .show(); // Add the Task object directly to the taskList
+         .show(); 
          return null;
       }
 
