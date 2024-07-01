@@ -75,7 +75,6 @@ public class BankSystem {
                if (action.equals("deposit")) {
                   System.out.println("How many do you wanna deposit?\n");
                   double value = scan.nextDouble();
-
                   accountt.receive(value);
                }
 
