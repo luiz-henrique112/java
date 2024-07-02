@@ -1,4 +1,3 @@
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -15,89 +14,119 @@ public class Schedule {
    public static void main(String[] args) {
 
       while (true) {
-         System.out.println("=================================================================\n Welcome to your Schedule App!\n Enter:\n 'add' for add a new event\n 'events' to see your events\n ");
+         System.out.println("=================================================================");
+         System.out.println(" Welcome to your Schedule App!");
+         System.out.println(" Enter:");
+         System.out.println(" 'add' for add a new event");
+         System.out.println(" 'events' to see your events");
+         System.out.println(" 'exit' to exit");
          String answer = scan.next();
 
-         if (answer.equals("add")) {
-            System.out.println("\n Enter the event name:");
-            String name = scan.next();
+         switch (answer) {
+            case "add":
+               addEvent();
+               break;
+            case "events":
+               viewEvents();
+               break;
+            case "exit":
+               return;
+            default:
+               System.out.println("Invalid option. Please try again.");
+         }
+      }
+   }
 
-            System.out.println("\n Enter the date of the event ('dd/MM/yyyy'):");
+   public static void viewEvents(){
+      if (!events.isEmpty()){
+         for (Event event : events) {
+            System.out.println("\nEvent: " + event.getName());
+            System.out.println("Date: " + event.getDate());
+            System.out.println("Id: " + event.getId());
+         }
+
+         System.out.println("\nEnter:");
+         System.out.println(" 'edit' if you want to edit an event");
+         System.out.println(" 'exclude' to exclude an event");
+
+         String answerr = scan.next();
+
+         switch (answerr) {
+            case "edit":
+               edit();
+               break;
+               
+            case "exclude":
+               exclude();
+               break;
+            default:
+               break;
+            }
+         } else {
+            System.out.println("\n There is no event :(");
+         }
+   }
+
+   public static void addEvent(){
+      System.out.println("\n Enter the event name:");
+      String name = scan.next();
+
+      System.out.println("\n Enter the date of the event ('dd/MM/yyyy'):");
+
+      try {
+         String dateInput = scan.next();
+         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+         LocalDate date = LocalDate.parse(dateInput, formatter);
+         event = new Event(name, date, id);
+         events.add(event);
+         id++;
+         System.out.println("\n Event added!");
+      } catch (DateTimeParseException e) {
+         System.out.println("Invalid date format, please use the 'dd/MM/yyyy' format");
+      }
+   }
+
+   public static void edit(){
+      System.out.println("\n Enter the name of the event you wanna edit:");
+      String name_e = scan.next();
+
+      System.out.println("\n Enter the Id of the event you wanna edit");
+      int id_e = scan.nextInt();
+
+      for (Event eventt : events){
+         if (name_e.equals(eventt.getName()) && id_e == eventt.getId()) {
+            System.out.println("\n Type the new name of the event:");
+            String newName = scan.next();
+            System.out.println("\n Now enter the new date of this event:");
             
             try {
-               String dateInput = scan.next();
+               String newDateInput = scan.next();
                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-               LocalDate date = LocalDate.parse(dateInput, formatter);
-               event = new Event(name, date, id);
-               events.add(event);
-               id++;
-               System.out.println("\n Event added!");
+               LocalDate newDate = LocalDate.parse(newDateInput, formatter);
+
+               eventt.setName(newName);
+               eventt.setDate(newDate);
+               System.out.println("\n Event edited with success!");
             } catch (DateTimeParseException e) {
                System.out.println("Invalid date format, please use the 'dd/MM/yyyy' format");
             }
+         } else {
+            System.out.println("\n Event not found");
          }
+      }
+   }
 
-         if (answer.equals("events")) {
-            if (!events.isEmpty()){
-               for (Event eventt : events) {
-                  System.out.println("\n Event: " + eventt.getName() + "\n Date: " + eventt.getDate() + "\n Id: " + eventt.getId());
-               }
+   public static void exclude(){
+      System.out.println("\n Enter the name of the event you wanna exclude:");
+      String name_ex = scan.next();
 
-               System.out.println("\n Enter:\n 'edit' if you wanna edit an event\n 'exclude' to exclude an event");
-               String answerr = scan.next();
+      System.out.println("\n Enter the Id of the event you wanna exclude:");
+      int id_ex = scan.nextInt();
 
-               if (answerr.equals("edit")) {
-                  System.out.println("\n Enter the name of the event you wanna edit:");
-                  String name_e = scan.next();
-
-                  System.out.println("\n Enter the Id of the event you wanna edit");
-                  int id_e = scan.nextInt();
-
-                  for (Event eventt : events){
-                     if (name_e.equals(eventt.getName()) && id_e == eventt.getId()) {
-                        System.out.println("\n Type the new name of the event:");
-                        String newName = scan.next();
-                        System.out.println("\n Now enter the new date of this event:");
-                        
-                        try {
-                           String newDateInput = scan.next();
-                           DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                           LocalDate newDate = LocalDate.parse(newDateInput, formatter);
-
-                           eventt.setName(newName);
-                           eventt.setDate(newDate);
-                           System.out.println("\n Event edited with success!");
-                        } catch (DateTimeParseException e) {
-                           System.out.println("Invalid date format, please use the 'dd/MM/yyyy' format");
-                        }
-                        
-                  } else {
-                        System.out.println("\n Event not found");
-                  }
-               }
-               }
-
-               if(answerr.equals("exclude")){
-                  System.out.println("\n Enter the name of the event you wanna exclude:");
-                  String name_ex = scan.next();
-
-                  System.out.println("\n Enter the Id of the event you wanna exclude:");
-                  int id_ex = scan.nextInt();
-
-                  for (Event eventt : events) {
-                     if (name_ex.equals(eventt.getName()) && id_ex == eventt.getId()){
-                        events.remove(eventt);
-                        System.out.println("\n Event excluded with success!");
-                     }
-                  }
-               }
-            } else {
-               System.out.println("\n There is no event :(");
-            }
-         }
-
-         if (answer.equals("exit")) {
-            break;
+      for (Event eventt : events) {
+         if (name_ex.equals(eventt.getName()) && id_ex == eventt.getId()){
+            events.remove(eventt);
+            System.out.println("\n Event excluded with success!");
          }
       }
    }
