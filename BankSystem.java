@@ -102,7 +102,8 @@ public class BankSystem {
             Account receiver = entry.getValue();
 
             if (receiver.getUserName().equals(name) && receiver.getCpf().equals(cpf)) {
-               receiver.receive(value);
+               boolean isPix = true;
+               receiver.receive(value, accountt, isPix);
                accountt.setBalance_lose(value);
                System.out.println("Transfer successful.");
                return;
@@ -115,7 +116,8 @@ public class BankSystem {
    public static void deposit(Account accountt){
       System.out.println("How many do you wanna deposit?\n");
       double value = scan.nextDouble();
-      accountt.receive(value);
+      boolean isPix = false;
+      accountt.receive(value, accountt, isPix);
    }
 
    public static void withdraw(Account accountt){
@@ -141,7 +143,7 @@ class Account {
 
    public Account(String name, String cpf, int id) {
       this.id = id;
-      this.balance = 50.0;
+      this.balance = 0.0;
       this.name = name;
       this.cpf = cpf;
    }
@@ -166,15 +168,18 @@ class Account {
       this.balance -= value;
    }
 
-   public void receive(double value) {
+   public void receive(double value, Account accountt, boolean isPix) {
       this.balance += value;
-      String notification = "Received " + value + " from " + account_n.getUserName();
+      if (isPix) {
+         account_n = accountt;
+         String notification = "Received " + value + " from " + account_n.getUserName();
 
-      Map<Integer, String> notifications = new HashMap<>();
-      notifications.put(getId(), notification);
+         Map<Integer, String> notifications = new HashMap<>();
+         notifications.put(getId(), notification);
 
-      for (Map.Entry<Integer, String> entry : notifications.entrySet()) {
-         notify = "\n Notifications: " + entry.getValue();
+         for (Map.Entry<Integer, String> entry : notifications.entrySet()) {
+            notify = "\n Notifications: " + entry.getValue();
+         }
       }
    }
 
