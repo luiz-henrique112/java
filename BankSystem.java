@@ -11,85 +11,92 @@ public class BankSystem {
       int id = 0;
 
       while (true) {
-         System.out.println("===========================================================================================\n Nexus Bank\n Hi!\n Enter\n 'create' for create a new account for you!\n 'login' for you sign in in your account");
+         System.out.println("===========================================================================================");
+         System.out.println(" Nexus Bank");
+         System.out.println(" Hi!");
+         System.out.println(" Enter");
+         System.out.println(" 'create' to create a new account for you!");
+         System.out.println(" 'login' to sign in to your account");
+         System.out.println(" 'exit' to exit");
          String answer = scan.next();
-
-         if (answer.equals("create")) {
-            System.out.println("\n Hello! Welcome to the Nexus Bank!\n Enter your name:");
-            String name = scan.next();
-
-            System.out.println("\n Enter your CPF:");
-            String cpf = scan.next();
-            id++;
-
-            Account account = new Account(name, cpf, id);
-            accounts.put(id, account);
-            System.out.println("Welcome " + account.getUserName() + ", your account was created with success!");
-
-         } else if (answer.equals("login")) {
-            System.out.println("\n Hi! \n For you can sign in, enter your name:");
-            String name_u = scan.next();
-
-            System.out.println("\n Enter your CPF:");
-            String cpf_u = scan.next();
-
-            Account accountt = null;
-
-            for (Map.Entry<Integer, Account> entry : accounts.entrySet()) {
-               Account account = entry.getValue();
-
-               if (account.getUserName().equals(name_u) && account.getCpf().equals(cpf_u)) {
-                  accountt = account;
-                  break;
-               }
-            }
-
-            if (accountt != null) {
-               System.out.println(accountt.message());
-               String action = scan.next();
-
-               if (action.equals("pix")) {
-                  System.out.println("Enter the name of the person:\n");
-                  String name = scan.next();
-
-                  System.out.println("Now, enter the Pix key of this person:\n");
-                  String cpf = scan.next();
-
-                  System.out.println("Enter the value you wanna transfer:\n");
-                  double value = scan.nextDouble();
-
-                  pix(accountt, accounts, name, cpf, value);
-               }
-
-               if (action.equals("withdraw")) {
-                  System.out.println("How many do you wanna withdraw?\n");
-                  double value = scan.nextDouble();
-
-                  if (value < accountt.getUserBalance()) {
-                     accountt.setBalance_lose(value);
-                  } else {
-                     System.out.println("Insufficient balance");
+      
+         switch (answer) {
+            case "create":
+               System.out.println("\n Hello! Welcome to the Nexus Bank!");
+               System.out.println(" Enter your name:");
+               String name = scan.next();
+      
+               System.out.println(" Enter your CPF:");
+               String cpf = scan.next();
+               id++;
+      
+               Account account = new Account(name, cpf, id);
+               accounts.put(id, account);
+               System.out.println("Welcome " + account.getUserName() + ", your account was created successfully!");
+               break;
+      
+            case "login":
+               System.out.println("\n Hi! To sign in, enter your name:");
+               String name_u = scan.next();
+      
+               System.out.println(" Enter your CPF:");
+               String cpf_u = scan.next();
+      
+               Account accountt = null;
+      
+               for (Map.Entry<Integer, Account> entry : accounts.entrySet()) {
+                  Account accountEntry = entry.getValue();
+      
+                  if (accountEntry.getUserName().equals(name_u) && accountEntry.getCpf().equals(cpf_u)) {
+                     accountt = accountEntry;
+                     break;
                   }
                }
-
-               if (action.equals("deposit")) {
-                  System.out.println("How many do you wanna deposit?\n");
-                  double value = scan.nextDouble();
-                  accountt.receive(value);
+      
+               if (accountt != null) {
+                  System.out.println(accountt.message());
+                  String action = scan.next();
+      
+                  switch (action) {
+                     case "pix":
+                        pix(accountt, accounts);
+                        break;
+                     case "withdraw":
+                        withdraw(accountt);
+                        break;
+                     case "deposit":
+                        deposit(accountt);
+                        break;
+                     default:
+                        System.err.println("Invalid action");
+                        break;
+                  }
+      
+               } else {
+                  System.err.println("User not found");
                }
-
-            } else {
-               System.err.println("User not found");
-            }
-         }
-
-         if (answer.equals("exit")) {
-            break;
+               break;
+      
+            case "exit":
+               return;
+      
+            default:
+               System.err.println("Invalid option. Please try again.");
+               break;
          }
       }
    }
 
-   public static void pix(Account accountt, Map<Integer, Account> accounts, String name, String cpf, double value) {
+   public static void pix(Account accountt, Map<Integer, Account> accounts) {
+      System.out.println("Enter the name of the person:\n");
+      String name = scan.next();
+
+      System.out.println("Now, enter the Pix key of this person:\n");
+      String cpf = scan.next();
+
+      System.out.println("Enter the value you wanna transfer:\n");
+      double value = scan.nextDouble();
+
       if (accountt.getUserBalance() >= value) {
          for (Map.Entry<Integer, Account> entry : accounts.entrySet()) {
             Account receiver = entry.getValue();
@@ -102,6 +109,23 @@ public class BankSystem {
             }
          }
          System.err.println("User not found");
+      }
+   }
+
+   public static void deposit(Account accountt){
+      System.out.println("How many do you wanna deposit?\n");
+      double value = scan.nextDouble();
+      accountt.receive(value);
+   }
+
+   public static void withdraw(Account accountt){
+      System.out.println("How many do you wanna withdraw?\n");
+      double value = scan.nextDouble();
+
+      if (value < accountt.getUserBalance()) {
+         accountt.setBalance_lose(value);
+      } else {
+         System.out.println("Insufficient balance");
       }
    }
 }
