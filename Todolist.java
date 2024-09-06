@@ -287,7 +287,7 @@
          }
       }
 
-      @Override
+      
       public String toString() {
          if (date != null) {
                return title + " (Date: " + date + ")";

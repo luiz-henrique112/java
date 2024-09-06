@@ -15,6 +15,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -30,9 +31,11 @@ public class StoreSystem extends Application {
    public static List<User> users = new ArrayList<>();
    public static List<String> currentUser = new ArrayList<>();
    public static List<Product> productss = new ArrayList<>();
+   public static List<Product> productsPaneList = new ArrayList<>();
+   public static List<Product> cartt = new ArrayList<>();
    
    public static String screen = "login";
-   public static int id = 1;;
+   public static int id = 1;
    public static int productId = 0;
 
    @Override
@@ -89,6 +92,18 @@ public class StoreSystem extends Application {
       logout.setPrefSize(60, 30);
       Button settingsBtn = new Button("Settings");
       settingsBtn.setPrefSize(60, 30);
+      search.setOnKeyPressed(e -> {
+         if (e.getCode() == KeyCode.ENTER) {
+            search(search.getText(), productPane);
+            
+         }updateProductPane(productPane, productsPaneList);
+
+         if (search.getText().equals("")){
+            productsPaneList.clear();
+            productPaneListReloading();
+            updateProductPane(productPane, productsPaneList);
+         }
+      });
 
       HBox buttons_n = new HBox(storeCartBtn, addProduct, logout, settingsBtn);
       buttons_n.setSpacing(15);
@@ -112,7 +127,7 @@ public class StoreSystem extends Application {
       change_password_btn.setOnAction(event -> showDialogBoxEdit("password", textEmail, textPassword, textUser));
       Button change_user_btn = new Button("Change user name");
       change_user_btn.setOnAction(event -> showDialogBoxEdit("user", textEmail, textPassword, textUser));
-      Button home = new Button("Home");
+      Button homee = new Button("Home");
       
       label_email.setFont(new Font(15));
       label_password.setFont(new Font(15));
@@ -137,14 +152,15 @@ public class StoreSystem extends Application {
 
       HBox buttons_s = new HBox();
       buttons_s.setSpacing(20);
-      buttons_s.getChildren().addAll(change_password_btn, change_user_btn, home);
-
+      buttons_s.getChildren().addAll(change_password_btn, change_user_btn, homee);
       
       FlowPane productcart = new FlowPane();
       productcart.setPadding(new Insets(10));
       productcart.setHgap(10);
       productcart.setVgap(10);
       productcart.setStyle("-fx-background-color: #f0f0f0;");
+      Button home = new Button("Home");
+
       VBox cart = new VBox(home, productcart);
       
       settings.getChildren().addAll(texts, buttons_s);
@@ -170,6 +186,8 @@ public class StoreSystem extends Application {
          emailInput.clear();
          passwordInput.clear();
          userInput.clear();
+         saveUserCartData();
+         cartt.clear();
          switchScene(scene_login, scene_login, scene_settings, scene_cart, "login");
       });
 
@@ -179,14 +197,15 @@ public class StoreSystem extends Application {
       });
       
       home.setOnAction(event -> switchScene(scene_dashboard, scene_login, scene_settings, scene_cart, "dashboard"));
-
+      homee.setOnAction(event -> switchScene(scene_dashboard, scene_login, scene_settings, scene_cart, "dashboard"));
+      
       storeCartBtn.setOnAction(event -> {
          for (User user : users) {
             if (user.getEmail().equals(currentUser.get(0)) &&
                user.getPassword().equals(currentUser.get(1)) &&
                user.getUserName().equals(currentUser.get(2))){
 
-               updateProductPane(productcart, user.getCart());
+               updateProductPane(productcart, cartt);
             }
          }
          switchScene(scene_dashboard, scene_login, scene_settings, scene_cart, "cart");
@@ -293,6 +312,7 @@ public class StoreSystem extends Application {
             user.getPassword().equals(password) &&
             user.getUserName().equals(userName)) {
 
+            getUserCart(user);
             setCurrentUser(user);
             switchScene(scene_dashboard, scene_login, scene_settings, scene_cart, "dashboard");
          }
@@ -324,7 +344,7 @@ public class StoreSystem extends Application {
             dialog.setTitle("Edit user");
 
             Label label_user_s = new Label("USER NAME:");
-            TextField textUser_s = new TextField(currentUser.get(2));
+            TextField textUser_s = new TextField();
             ButtonType save_s = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
             
             VBox alignment = new VBox(label_user_s, textUser_s);
@@ -334,17 +354,44 @@ public class StoreSystem extends Application {
 
             dialog.setResultConverter(dialogButton -> {
                if (dialogButton == save_s) {
-                  for (User user  : users) {
-                     if (textUser_s.getText().equals(user.getUserName())) {
-                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                        alert.setTitle("WARNING");
-                        alert.setHeaderText(null);
-                        alert.setContentText("This user name is already used by another user, please try another one.");
-                        alert.showAndWait();
-                     } else {
-                        user.setUser(textUser_s.getText().trim());
-                        setCurrentUser(user);
-                        setUserData(textEmail, textPassword, textUser);
+                  for (User user : users) {
+                     
+                     if (user.getEmail().equals(currentUser.get(0)) &&
+                        user.getPassword().equals(currentUser.get(1)) &&
+                        user.getUserName().equals(currentUser.get(2))) {
+                  
+                        
+                        if (textUser_s.getText().length() < 4) {
+                           Alert alert = new Alert(Alert.AlertType.WARNING);
+                           alert.setTitle("WARNING");
+                           alert.setHeaderText(null);
+                           alert.setContentText("The user name must have more than 4 characters, please try another one.");
+                           alert.showAndWait();
+                           break; 
+                        }
+                        
+                        boolean usernameExists = false;
+                        for (User otherUser : users) {
+                           if (otherUser != user && otherUser.getUserName().equals(textUser_s.getText())) {
+                              usernameExists = true;
+                              break;
+                           }
+                        }
+                  
+                        if (usernameExists) {
+                           Alert alert = new Alert(Alert.AlertType.WARNING);
+                           alert.setTitle("WARNING");
+                           alert.setHeaderText(null);
+                           alert.setContentText("This user name is already used by another user, please try another one.");
+                           alert.showAndWait();
+                           break;
+                        } else {
+                           
+                           user.setUser(textUser_s.getText().trim());
+                           setCurrentUser(user);
+                           setUserData(textEmail, textPassword, textUser);
+                           break; 
+                        }
                      }
                   }
                }
@@ -413,9 +460,7 @@ public class StoreSystem extends Application {
             user.getUserName().equals(currentUser.get(2))) {
 
             int productId = Integer.parseInt(productBox.getId());
-            addToCart.setOnAction(event -> {
-               addToCart(user.getCart(), productId);
-            });
+            addToCart.setOnAction(event -> addToCart(user.getCart(), productId));
          }
       }
 
@@ -451,13 +496,14 @@ public class StoreSystem extends Application {
             if (price_input_p.getText().matches("\\d+")) {
                Product product = new Product(name_input_p.getText(), description_input_p.getText(), Integer.parseInt(currentUser.get(3)), productId, price_input_p.getText());
                productss.add(product);
+               productsPaneList.add(product);
                productId++;
-               updateProductPane(productPane, productss);
+               updateProductPane(productPane, productsPaneList);
             } else {
                Alert alert = new Alert(Alert.AlertType.WARNING);
                alert.setTitle("WARNING");
                alert.setHeaderText(null);
-               alert.setContentText("The price can't have letters");
+               alert.setContentText("The price can only have numbers");
                alert.showAndWait();
             }
          }
@@ -467,7 +513,7 @@ public class StoreSystem extends Application {
    }
 
    public static void updateProductPane(FlowPane productPane, List<Product> list) {
-      productPane.getChildren().clear();
+      productPane.getChildren().clear(); 
       for (Product pro : list) {
          productPane.getChildren().add(createProductcart(pro));
       }
@@ -476,7 +522,42 @@ public class StoreSystem extends Application {
    private static void addToCart(List<Product> cart, int productId){
       for (Product product : productss) {
          if (product.getId() == productId) {
-            cart.add(product);
+            cartt.add(product);
+         }
+      }
+   }
+
+   public static void search(String text, FlowPane productPane){
+      for (Product product : productss) {
+         if(!product.getName().equals(text)){
+            productsPaneList.remove(product);
+         }
+      }
+   }
+
+   public static void productPaneListReloading(){
+      for (Product product : productss) {
+         productsPaneList.add(product);
+      }
+   }
+
+   public static void saveUserCartData(){
+      for (User user : users) {
+         if (user.getEmail().equals(currentUser.get(0)) &&
+            user.getPassword().equals(currentUser.get(1)) &&
+            user.getUserName().equals(currentUser.get(2))) {
+
+            for (Product product : cartt) {
+               user.getCart().add(product);
+            }
+         }
+      }
+   }
+
+   public static void getUserCart(User user){
+      if(!user.getCart().isEmpty()){
+         for (Product product : user.getCart()){
+            cartt.add(product);
          }
       }
    }
@@ -520,19 +601,17 @@ public class StoreSystem extends Application {
    public static void main(String[] args) {
       launch(args);
 
-
       for(User user : users){
          System.out.println(user.getUserName());
-         for (Product pro : user.getCart()){
+         for (Product pro : cartt){
             System.out.println(pro.getName());
          }
-         
       }
    }
 }
 
 class User {
-   public static List<Product> cart = new ArrayList<>();
+   public List<Product> cart = new ArrayList<>();
    String email;
    String password;
    String userName;
@@ -581,7 +660,6 @@ class Product {
    int userId;
    int id;
    
-
    public Product(String name, String description, int userId, int id, String price) {
       this.name = name;
       this.description = description;
